@@ -13,7 +13,7 @@ services:
       - key: ALLOWED_ORIGINS
         value: https://www.everydayjitney.com,https://everydayjitney.com
       - key: SHOPIFY_STORE_DOMAIN
-        value: zd-store-01m6bmrz5nygffs23a0hskcaa8.myshopify.com
+        value: sihxha-06.myshopify.com
       - key: MAKE_ORDERS_WEBHOOK_URL
         sync: false
       - key: STRIPE_SECRET_KEY
