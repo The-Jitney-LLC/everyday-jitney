@@ -317,22 +317,22 @@
     };
   }
   var PREVIEW_PRODUCTS = [
-    sample(1, "phone-tech", "Clear Silicone Phone Case", 12.99, "Soft, transparent case that shows your phone's design while guarding against drops and scratches.", [{ name: "Model", values: ["iPhone 16", "iPhone 16 Pro", "Galaxy S25"] }]),
-    sample(2, "phone-tech", "Rugged Dual-Layer Case", 18.99, "Hard outer shell with a soft inner layer. Raised edges protect the screen and camera.", [{ name: "Color", values: ["Black", "Navy", "Olive"] }]),
-    sample(3, "phone-tech", "Tempered Glass Screen Protector", 9.99, "9H hardness glass, clear and fingerprint resistant, with an alignment frame for easy install."),
-    sample(4, "phone-tech", "Braided USB-C Cable, 2 m", 11.99, "Braided nylon cable with reinforced ends. Supports fast charging."),
-    sample(5, "phone-tech", "30W GaN Wall Charger", 22.99, "Compact fast charger built on GaN parts, so it runs cooler and smaller."),
-    sample(6, "phone-tech", "Magnetic Car Mount", 15.99, "Strong magnetic mount for dash or air vent. Attach and remove with one hand."),
-    sample(7, "kitchen", "Vegetable Chopper", 19.99, "Manual chopper that dices and slices vegetables quickly."),
-    sample(8, "kitchen", "Silicone Baking Mat", 14.99, "Reusable non-stick mat that replaces parchment paper. Heat resistant.", [{ name: "Size", values: ["Half sheet", "Quarter sheet"] }]),
-    sample(9, "kitchen", "5-Piece Kitchen Knife Set", 27.99, "High-carbon stainless steel knives for everyday cutting and chopping."),
-    sample(10, "kitchen", "Bamboo Cutting Board", 15.99, "Bamboo board in a practical everyday size."),
-    sample(11, "home", "Stackable Pantry Bins, Set of 4", 24.99, "Clear stackable bins that keep shelves and cabinets organized."),
-    sample(12, "health-beauty", "Facial Cleansing Brush", 16.99, "Soft silicone brush with two speeds. Rechargeable and water resistant."),
-    sample(13, "accessories", "Canvas Crossbody Bag", 21.99, "Everyday crossbody with an adjustable strap and zip pockets.", [{ name: "Color", values: ["Sand", "Black"] }]),
-    sample(14, "socks-care", "Cushioned Crew Socks, 6 Pairs", 17.99, "Soft cotton-blend socks with a cushioned sole.", [{ name: "Size", values: ["S/M", "L/XL"] }]),
-    sample(15, "apparel", "Men's Classic Crew T-Shirt", 18.99, "Soft cotton crew neck for everyday wear.", [{ name: "Size", values: ["S", "M", "L", "XL", "2XL"] }, { name: "Color", values: ["White", "Navy", "Heather"] }]),
-    sample(16, "pet", "Collapsible Pet Bowl", 9.99, "Folding silicone bowl for walks and travel."),
+    sample(1, "phone-tech", "Clear Silicone Phone Case", 24.99, "Soft, transparent case that shows your phone's design while guarding against drops and scratches.", [{ name: "Model", values: ["iPhone 16", "iPhone 16 Pro", "Galaxy S25"] }]),
+    sample(2, "phone-tech", "Rugged Dual-Layer Case", 34.99, "Hard outer shell with a soft inner layer. Raised edges protect the screen and camera.", [{ name: "Color", values: ["Black", "Navy", "Olive"] }]),
+    sample(3, "phone-tech", "Tempered Glass Screen Protector", 21.99, "9H hardness glass, clear and fingerprint resistant, with an alignment frame for easy install."),
+    sample(4, "phone-tech", "Braided USB-C Cable, 2 m", 22.99, "Braided nylon cable with reinforced ends. Supports fast charging."),
+    sample(5, "phone-tech", "30W GaN Wall Charger", 39.99, "Compact fast charger built on GaN parts, so it runs cooler and smaller."),
+    sample(6, "phone-tech", "Magnetic Car Mount", 29.99, "Strong magnetic mount for dash or air vent. Attach and remove with one hand."),
+    sample(7, "kitchen", "Vegetable Chopper", 34.99, "Manual chopper that dices and slices vegetables quickly."),
+    sample(8, "kitchen", "Silicone Baking Mat", 24.99, "Reusable non-stick mat that replaces parchment paper. Heat resistant.", [{ name: "Size", values: ["Half sheet", "Quarter sheet"] }]),
+    sample(9, "kitchen", "5-Piece Kitchen Knife Set", 89.99, "High-carbon stainless steel knives for everyday cutting and chopping."),
+    sample(10, "kitchen", "Bamboo Cutting Board", 29.99, "Bamboo board in a practical everyday size."),
+    sample(11, "home", "Stackable Pantry Bins, Set of 4", 44.99, "Clear stackable bins that keep shelves and cabinets organized."),
+    sample(12, "health-beauty", "Facial Cleansing Brush", 39.99, "Soft silicone brush with two speeds. Rechargeable and water resistant."),
+    sample(13, "accessories", "Canvas Crossbody Bag", 49.99, "Everyday crossbody with an adjustable strap and zip pockets.", [{ name: "Color", values: ["Sand", "Black"] }]),
+    sample(14, "socks-care", "Cushioned Crew Socks, 6 Pairs", 24.99, "Soft cotton-blend socks with a cushioned sole.", [{ name: "Size", values: ["S/M", "L/XL"] }]),
+    sample(15, "apparel", "Men's Classic Crew T-Shirt", 22.99, "Soft cotton crew neck for everyday wear.", [{ name: "Size", values: ["S", "M", "L", "XL", "2XL"] }, { name: "Color", values: ["White", "Navy", "Heather"] }]),
+    sample(16, "pet", "Collapsible Pet Bowl", 21.99, "Folding silicone bowl for walks and travel."),
   ];
   var previewCart = [];
   try { previewCart = JSON.parse(lsGet(PREVIEW_CART_KEY) || "[]"); } catch (e) { previewCart = []; }
@@ -473,7 +473,9 @@
     var job = LIVE ? liveFetchProducts(opts) : Promise.resolve(previewFetch(opts));
     job.then(function (res) {
       var before = state.items.length;
-      state.items = more ? state.items.concat(res.items) : res.items;
+      var lo = Number(CFG.priceMin || 0), hi = Number(CFG.priceMax || 0);
+      var fresh = res.items.filter(function (p) { return (!lo || p.price >= lo) && (!hi || p.price <= hi); });
+      state.items = more ? state.items.concat(fresh) : fresh;
       state.next = res.next;
       renderGrid(more ? before : 0);
     }).catch(function (err) {
