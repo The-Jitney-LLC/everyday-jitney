@@ -12,7 +12,7 @@
  */
 window.EJ_CONFIG = {
   // Your Shopify store's myshopify address, e.g. "everyday-jitney.myshopify.com"
-  shopifyDomain: "zd-store-01m6bmrz5nygffs23a0hskcaa8.myshopify.com", // confirm in Shopify Admin > Settings > Domains
+  shopifyDomain: "sihxha-06.myshopify.com", // Shopify Admin > Settings shows this address
 
   // Shopify Admin > Sales channels > Headless > your storefront > Storefront API token
   storefrontToken: "",
@@ -39,6 +39,10 @@ window.EJ_CONFIG = {
   // Cookie domain for the ICP session, so checkout.everydayjitney.com can read it.
   // Use ".everydayjitney.com" in production; leave empty for local testing.
   cookieDomain: "",
+
+  // Only products priced in this range (USD) appear on the site. Use 0 for no limit.
+  priceMin: 20,
+  priceMax: 200,
 
   // Shown in the cart. Set to the amount your store actually offers, or 0 to hide.
   freeShippingThreshold: 0,
