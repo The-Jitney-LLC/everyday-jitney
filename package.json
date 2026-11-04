@@ -1,0 +1,15 @@
+{
+  "name": "everyday-jitney",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Everyday Jitney storefront (Shopify Storefront API) and back end (ICP beacon + Shopify webhooks to Make).",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "SERVE_STATIC=true node --watch server/index.js",
+    "test": "node --test test/server.test.js test/stripe-flow.test.js"
+  },
+  "engines": { "node": ">=20.12" },
+  "dependencies": { "express": "4.21.2" },
+  "license": "UNLICENSED"
+}
