@@ -1,0 +1,88 @@
+{
+  "name": "Everyday Jitney - Stripe Sales to Sales Worksheet",
+  "metadata": {
+    "version": 1
+  },
+  "flow": [
+    {
+      "id": 1,
+      "module": "gateway:CustomWebHook",
+      "version": 1,
+      "parameters": {
+        "hook": 3017335,
+        "maxResults": 1
+      },
+      "mapper": {},
+      "metadata": {
+        "designer": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "id": 2,
+      "module": "google-sheets:addRow",
+      "version": 2,
+      "parameters": {
+        "__IMTCONN__": 11564228
+      },
+      "mapper": {
+        "from": "drive",
+        "mode": "select",
+        "values": {
+          "0": "{{1.row.record_type}}",
+          "1": "{{1.row.event_time_local}}",
+          "2": "{{1.row.event_time_utc}}",
+          "3": "{{1.row.shopify_order_name}}",
+          "4": "{{1.row.shopify_order_id}}",
+          "5": "{{1.row.customer_name}}",
+          "6": "{{1.row.customer_email}}",
+          "7": "{{1.row.ship_city}}",
+          "8": "{{1.row.ship_state}}",
+          "9": "'{{1.row.ship_zip}}",
+          "10": "{{1.row.ship_country}}",
+          "11": "{{1.row.items_summary}}",
+          "12": "{{1.row.units}}",
+          "13": "{{1.row.suppliers}}",
+          "14": "{{1.row.currency}}",
+          "15": "{{1.row.merchandise_subtotal}}",
+          "16": "{{1.row.discounts}}",
+          "17": "{{1.row.shipping}}",
+          "18": "{{1.row.sales_tax}}",
+          "19": "{{1.row.gross_amount}}",
+          "20": "{{1.row.stripe_fee}}",
+          "21": "{{1.row.net_amount}}",
+          "22": "{{1.row.est_cogs}}",
+          "23": "{{1.row.est_gross_profit}}",
+          "24": "{{1.row.payment_method}}",
+          "25": "'{{1.row.card_last4}}",
+          "26": "{{1.row.funds_available_on}}",
+          "27": "{{1.row.stripe_checkout_session_id}}",
+          "28": "{{1.row.stripe_payment_intent_id}}",
+          "29": "{{1.row.stripe_charge_id}}",
+          "30": "{{1.row.stripe_balance_txn_id}}",
+          "31": "{{1.row.stripe_receipt_url}}",
+          "32": "{{1.row.stripe_event_id}}",
+          "33": "{{1.row.icp_session_id}}",
+          "34": "{{1.row.shopify_status}}",
+          "35": "{{1.row.notes}}",
+          "36": "{{1.row.record_id}}",
+          "37": "{{1.row.recorded_at}}"
+        },
+        "sheetId": "Stripe Sales Ledger",
+        "spreadsheetId": "/1s5nXPmssykJbSPIQ1ysLS0QL3N29dO4ljOWY40ED_u0",
+        "includesHeaders": true,
+        "insertDataOption": "OVERWRITE",
+        "valueInputOption": "USER_ENTERED",
+        "insertUnformatted": false
+      },
+      "metadata": {
+        "designer": {
+          "x": 300,
+          "y": 0
+        }
+      }
+    }
+  ]
+}
