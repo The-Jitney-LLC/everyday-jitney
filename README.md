@@ -57,12 +57,12 @@ Shopper ─ browses www.everydayjitney.com ─ ICP beacon ──▶ /api/icp ─
 2. Create **collections** for your departments. Each one becomes a tab in the navy department bar.
 3. Install the **Headless** sales channel, create a storefront, and copy its **public Storefront API token**. Turn on product listings and inventory access.
 4. **Publish your products to the Headless channel.**
-5. Confirm your store's `.myshopify.com` address under Settings → Domains. It's prefilled as `zd-store-01m6bmrz5nygffs23a0hskcaa8.myshopify.com`.
+5. Confirm your store's `.myshopify.com` address under Settings → Domains. It's prefilled as `sihxha-06.myshopify.com`.
 6. Swap `public/assets/jitney-logo.svg` for your original logo if you have a sharper file (or upload a PNG and change the three `jitney-logo.svg` references in `public/index.html`).
 
 ### 2. Fill in `public/config.js`
 ```js
-shopifyDomain: "zd-store-01m6bmrz5nygffs23a0hskcaa8.myshopify.com",
+shopifyDomain: "sihxha-06.myshopify.com",
 storefrontToken: "public token from step 1.3",
 checkoutProvider: "stripe",
 apiBase: "https://api.everydayjitney.com",
