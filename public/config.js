@@ -1,50 +1,36 @@
 /*
  * Everyday Jitney — site settings
- * ------------------------------------------------------------------
- * This is the ONLY file you need to edit to go live.
- *
- * Leave shopifyDomain or storefrontToken empty and the site runs in
- * PREVIEW MODE: it shows labeled sample products and checkout is off.
- *
  * The Storefront API token is a PUBLIC token (Shopify designs it to be
  * used in the browser). Never put an Admin API token or a webhook
- * secret in this file — those go in the server's .env file.
+ * secret in this file — those go in Render's Environment settings.
  */
 window.EJ_CONFIG = {
-  // Your Shopify store's myshopify address, e.g. "everyday-jitney.myshopify.com"
-  shopifyDomain: "sihxha-06.myshopify.com", // Shopify Admin > Settings shows this address
+  // Shopify Admin > Settings shows this address
+  shopifyDomain: "sihxha-06.myshopify.com",
 
-  // Shopify Admin > Sales channels > Headless > your storefront > Storefront API token
-  storefrontToken: "",
+  // Shopify Admin > Headless > storefront > Storefront API > Public access token
+  storefrontToken: "88ad50965309e27e130de9083cf2d73f",
 
-  // Storefront API version. Shopify supports each version for about 12 months;
-  // check https://shopify.dev/docs/api/usage/versioning and bump when needed.
+  // Storefront API version
   apiVersion: "2026-07",
 
-  // How shoppers pay:
-  //   "stripe"  = your back end creates a Stripe Checkout Session and the shopper
-  //               pays on Stripe's hosted page (card numbers never touch this site).
-  //   "shopify" = Shopify's hosted checkout (needed for automatic Collective forwarding).
+  // "stripe" = shoppers pay on Stripe's hosted page
   checkoutProvider: "stripe",
 
-  // Your back end's address, used for Stripe checkout. No trailing slash.
-  //   e.g. "https://api.everydayjitney.com"
+  // Your back end's address (filled in after Render is set up). No trailing slash.
   apiBase: "",
 
-  // Where the ICP beacon sends events. Point this at your back end:
-  //   "https://api.everydayjitney.com/api/icp"  (recommended)
-  // Leave empty to keep the beacon off (events are still logged to the console).
+  // Where the ICP beacon sends events (filled in after Render is set up)
   icpEndpoint: "",
 
-  // Cookie domain for the ICP session, so checkout.everydayjitney.com can read it.
-  // Use ".everydayjitney.com" in production; leave empty for local testing.
+  // Use ".everydayjitney.com" once the domain is connected
   cookieDomain: "",
 
   // Only products priced in this range (USD) appear on the site. Use 0 for no limit.
   priceMin: 20,
   priceMax: 200,
 
-  // Shown in the cart. Set to the amount your store actually offers, or 0 to hide.
+  // Shown in the cart. 0 hides the free-shipping note.
   freeShippingThreshold: 0,
 
   // Contact shown in the footer
