@@ -259,6 +259,10 @@
 
   function liveFetchProducts(opts) {
     var after = opts.after || null;
+    if (opts.collection === "__christmas" || opts.collection === "__black-friday") {
+      var seasonal = opts.collection === "__christmas" ? "(tag:christmas OR title:christmas OR tag:holiday)" : '(tag:black-friday OR tag:"Black Friday")';
+      return liveFetchProducts({query:seasonal, sort:opts.sort, after:after});
+    }
     if (opts.collection) {
       var s = SORT_MAP.collection[opts.sort] || SORT_MAP.collection.BEST_SELLING;
       return sfProducts(
@@ -483,7 +487,7 @@
   var productCache = {};
 
   function renderRoutes() {
-    var all = [{ handle: "", title: "All products" }].concat(state.depts);
+    var all = [{ handle: "", title: "All products" }, { handle: "__christmas", title: "Christmas Specials" }, { handle: "__black-friday", title: "Black Friday Deals" }].concat(state.depts);
     $("#routes").innerHTML = all.map(function (d) {
       return '<button class="route" type="button" data-collection="' + esc(d.handle) + '" aria-pressed="' + (d.handle === state.collection && !state.query) + '"><span class="pip" aria-hidden="true"></span>' + esc(d.title) + "</button>";
     }).join("");
@@ -583,7 +587,7 @@
   function setCollection(handle) {
     var d = state.depts.filter(function (x) { return x.handle === handle; })[0];
     state.collection = handle || "";
-    state.collectionTitle = d ? d.title : "All products";
+    state.collectionTitle = handle === "__christmas" ? "Christmas Specials" : handle === "__black-friday" ? "Black Friday Deals" : d ? d.title : "All products";
     state.query = "";
     $("#searchInput").value = "";
     renderRoutes();

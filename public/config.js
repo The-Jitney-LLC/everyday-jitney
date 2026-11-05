@@ -27,8 +27,8 @@ window.EJ_CONFIG = {
   cookieDomain: "",
 
   // Only products priced in this range (USD) appear on the site. Use 0 for no limit.
-  priceMin: 20,
-  priceMax: 200,
+  priceMin: 0,
+  priceMax: 0,
 
   // Shown in the cart. 0 hides the free-shipping note.
   freeShippingThreshold: 0,
