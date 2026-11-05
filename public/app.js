@@ -483,11 +483,13 @@
   /* ================================================================
      State + rendering
      ================================================================ */
-  var state = { depts: [], collection: "", collectionTitle: "All products", query: "", sort: "BEST_SELLING", items: [], next: null, loading: false, cart: null };
+  var state = { depts: [], collection: "home-kitchen", collectionTitle: "Home & Kitchen", query: "", sort: "BEST_SELLING", items: [], next: null, loading: false, cart: null };
   var productCache = {};
 
   function renderRoutes() {
-    var all = [{ handle: "", title: "All products" }, { handle: "__black-friday", title: "Black Friday Deals" }].concat(state.depts);
+    var priority = ["health-beauty", "home-kitchen", "phone-accessories", "bags-accessories"];
+    var ordered = state.depts.slice().sort(function(a,b){ var x=priority.indexOf(a.handle),y=priority.indexOf(b.handle);return (x<0?99:x)-(y<0?99:y); });
+    var all = [{ handle: "", title: "All products" }, { handle: "__black-friday", title: "Black Friday Deals" }].concat(ordered);
     $("#routes").innerHTML = all.map(function (d) {
       return '<button class="route" type="button" data-collection="' + esc(d.handle) + '" aria-pressed="' + (d.handle === state.collection && !state.query) + '"><span class="pip" aria-hidden="true"></span>' + esc(d.title) + "</button>";
     }).join("");
