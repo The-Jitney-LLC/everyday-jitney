@@ -483,11 +483,11 @@
   /* ================================================================
      State + rendering
      ================================================================ */
-  var state = { depts: [], collection: "best-sellers", collectionTitle: "Best Sellers", query: "", sort: "BEST_SELLING", items: [], next: null, loading: false, cart: null };
+  var state = { depts: [], collection: "", collectionTitle: "All products", query: "", sort: "BEST_SELLING", items: [], next: null, loading: false, cart: null };
   var productCache = {};
 
   function renderRoutes() {
-    var all = [{ handle: "", title: "All products" }, { handle: "__christmas", title: "Christmas Specials" }, { handle: "__black-friday", title: "Black Friday Deals" }].concat(state.depts);
+    var all = [{ handle: "", title: "All products" }, { handle: "__black-friday", title: "Black Friday Deals" }].concat(state.depts);
     $("#routes").innerHTML = all.map(function (d) {
       return '<button class="route" type="button" data-collection="' + esc(d.handle) + '" aria-pressed="' + (d.handle === state.collection && !state.query) + '"><span class="pip" aria-hidden="true"></span>' + esc(d.title) + "</button>";
     }).join("");
