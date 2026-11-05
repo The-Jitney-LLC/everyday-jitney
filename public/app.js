@@ -122,8 +122,8 @@
 
   var PRODUCT_FIELDS =
     "id handle title vendor productType availableForSale descriptionHtml " +
-    "featuredImage { url(transform:{maxWidth:640}) altText } " +
-    "images(first: 10) { nodes { url(transform:{maxWidth:1100}) altText } } " +
+    "featuredImage { url(transform:{maxWidth:1100}) width height altText } " +
+    "images(first: 50) { nodes { url(transform:{maxWidth:1600}) width height altText } } " +
     "options { name optionValues { name } } " +
     "priceRange { minVariantPrice { amount currencyCode } } " +
     "compareAtPriceRange { minVariantPrice { amount currencyCode } } " +
@@ -152,8 +152,10 @@
       available: p.availableForSale,
       descriptionHtml: p.descriptionHtml,
       image: p.featuredImage ? p.featuredImage.url : null,
-      imageAlt: (p.featuredImage && p.featuredImage.altText) || p.title,
-      images: ((p.images && p.images.nodes) || []).map(function (i) { return { url: i.url, alt: i.altText || p.title }; }),
+      imageAlt: p.title,
+      imageWidth: p.featuredImage && p.featuredImage.width,
+      imageHeight: p.featuredImage && p.featuredImage.height,
+      images: ((p.images && p.images.nodes) || []).map(function (i) { return { url: i.url, width: i.width, height: i.height, alt: p.title }; }),
       options: (p.options || []).map(function (o) { return { name: o.name, values: (o.optionValues || []).map(function (v) { return v.name; }) }; })
         .filter(function (o) { return !(o.name === "Title" && o.values.length === 1 && o.values[0] === "Default Title"); }),
       price: Number(min.amount), currency: min.currencyCode,
@@ -397,7 +399,7 @@
   /* ================================================================
      State + rendering
      ================================================================ */
-  var state = { depts: [], collection: "", collectionTitle: "All products", query: "", sort: "BEST_SELLING", items: [], next: null, loading: false, cart: null };
+  var state = { depts: [], collection: "best-sellers", collectionTitle: "Best Sellers", query: "", sort: "BEST_SELLING", items: [], next: null, loading: false, cart: null };
   var productCache = {};
 
   function renderRoutes() {
@@ -422,10 +424,10 @@
     else if (!p.available) tag = '<span class="card-tag">Sold out</span>';
     else if (p.compareAt) tag = '<span class="card-tag sale">Sale</span>';
     var media = p.image
-      ? '<img src="' + esc(p.image) + '" alt="' + esc(p.imageAlt) + '" loading="lazy" width="640" height="640" />'
+      ? '<img src="' + esc(p.image) + '" alt="' + esc(p.imageAlt) + '" loading="lazy" decoding="async"' + (p.imageWidth && p.imageHeight ? ' width="' + p.imageWidth + '" height="' + p.imageHeight + '"' : '') + ' />'
       : placeholder(p.dept, p.sample ? "Supplier photo" : "No photo yet");
     var single = p.variants.length === 1;
-    return '<article class="card">' +
+    return '<article class="card" data-product-handle="' + esc(p.handle) + '">' +
       '<button class="card-media" type="button" data-open="' + esc(p.id) + '" aria-label="View ' + esc(p.title) + '">' + media + tag + "</button>" +
       '<div class="card-body">' +
         (p.dept ? '<span class="card-dept">' + esc(p.dept) + "</span>" : "") +
@@ -755,7 +757,7 @@
     if (!q) { setCollection(state.collection); return; }
     state.collection = "";
     renderRoutes();
-    ICP.track("search", { query: q });
+    ICP.track("search", { query_length: q.length });
     loadProducts(false);
   }
 
@@ -774,9 +776,10 @@
 
   function renderPolicies(shop) {
     var list = shop ? [shop.shippingPolicy, shop.refundPolicy, shop.privacyPolicy, shop.termsOfService].filter(Boolean) : [];
-    $("#policyLinks").innerHTML = '<span class="mono">STORE POLICIES</span>' + (list.length
+    $("#policyLinks").innerHTML = '<span class="mono">STORE POLICIES</span><a href="enterprise-agreement.html">Enterprise agreement</a><button type="button" id="privacyChoices">Privacy choices</button>' + (list.length
       ? list.map(function (p) { return '<a href="' + esc(p.url) + '" target="_blank" rel="noopener">' + esc(p.title) + "</a>"; }).join("")
       : "<span>Shipping, returns, privacy and terms appear here once they're set in Shopify.</span>");
+    $("#privacyChoices").addEventListener("click", function () { if (window.EJConsent) window.EJConsent.open(); });
   }
 
   if (LIVE) {

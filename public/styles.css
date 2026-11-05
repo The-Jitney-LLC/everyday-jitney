@@ -180,8 +180,8 @@ a { color: var(--navy); }
   overflow: hidden; transition: box-shadow .2s, transform .2s;
 }
 .card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
-.card-media { position: relative; aspect-ratio: 3 / 4; max-width: 100%; background: #fff; border: 0; padding: 0; cursor: pointer; display: block; width: 100%; }
-.card-media img { width: 100%; height: 100%; object-fit: contain; padding: 10px; }
+.card-media { position: relative; aspect-ratio: 2 / 3; max-width: 100%; background: #fff; border: 0; padding: 0; cursor: pointer; display: block; width: 100%; }
+.card-media img { width: 100%; height: 100%; object-fit: contain; object-position: center; padding: 10px; }
 .card-tag {
   position: absolute; left: 10px; top: 10px; padding: 3px 8px; border-radius: 3px;
   background: var(--paper); color: var(--slate); font: 500 .66rem/1.4 var(--f-mono); letter-spacing: .08em; text-transform: uppercase;
@@ -252,7 +252,7 @@ a { color: var(--navy); }
 .drawer-head h2 { margin: 0; font: 800 1.5rem/1 var(--f-display); font-stretch: 80%; text-transform: uppercase; color: var(--navy); }
 .drawer-lines { flex: 1; overflow-y: auto; padding: 8px 20px; }
 .line { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: start; }
-.line-thumb { width: 72px; height: 72px; border-radius: var(--r); border: 1px solid var(--line); background: #fff; position: relative; overflow: hidden; }
+.line-thumb { width: 72px; height: 108px; border-radius: var(--r); border: 1px solid var(--line); background: #fff; position: relative; overflow: hidden; }
 .line-thumb img { width: 100%; height: 100%; object-fit: contain; }
 .line-thumb .placeholder svg { width: 32px; height: 32px; }
 .line-thumb .placeholder span { display: none; }
@@ -281,10 +281,10 @@ a { color: var(--navy); }
 .pdp-close { position: absolute; right: 14px; top: 14px; z-index: 2; }
 .pdp-body { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); }
 .gallery { background: #fff; border-right: 1px solid var(--line); padding: 20px; }
-.gallery-main { position: relative; aspect-ratio: 1 / 1; max-width: 100%; }
+.gallery-main { position: relative; height: min(68svh, 680px); min-height: 240px; max-width: 100%; }
 .gallery-main img { width: 100%; height: 100%; object-fit: contain; }
 .thumbs { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; }
-.thumbs button { flex: none; width: 60px; height: 60px; padding: 0; border: 1.5px solid var(--line); border-radius: var(--r); background: #fff; cursor: pointer; overflow: hidden; }
+.thumbs button { flex: none; width: 60px; height: 90px; padding: 0; border: 1.5px solid var(--line); border-radius: var(--r); background: #fff; cursor: pointer; overflow: hidden; }
 .thumbs button[aria-current="true"] { border-color: var(--navy); }
 .thumbs img { width: 100%; height: 100%; object-fit: contain; }
 .pdp-info { padding: 32px 30px 30px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
@@ -306,6 +306,15 @@ a { color: var(--navy); }
 .pdp-desc { color: var(--slate); border-top: 1px solid var(--line); padding-top: 14px; }
 .pdp-desc p { margin: 0 0 10px; }
 .pdp-desc ul { margin: 0 0 10px; padding-left: 20px; }
+.pdp-desc img { max-width: 100%; width: auto; height: auto; object-fit: contain; object-position: center; }
+.consent-dialog { width: min(640px, calc(100% - 32px)); max-height: 88svh; overflow: auto; border: 1px solid var(--line); border-radius: 14px; padding: 28px; color: var(--ink); }
+.consent-dialog::backdrop { background: rgba(7,29,58,.72); }
+.consent-dialog img { width: 173px; height: auto; margin-bottom: 14px; }
+.consent-dialog h2 { color: var(--navy); }
+.consent-check { display: flex; align-items: start; gap: 12px; padding: 16px; background: var(--paper); border-radius: 8px; }
+.consent-check input { margin-top: 7px; }
+.consent-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.consent-actions .btn { height: auto; min-height: 48px; padding-block: 12px; }
 
 .toast {
   position: fixed; z-index: 120; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);

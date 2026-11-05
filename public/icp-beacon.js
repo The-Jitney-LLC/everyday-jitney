@@ -32,7 +32,8 @@
   var FLUSH_EVERY_MS = 12000;
   var MAX_BATCH = 50;
 
-  var optedOut = navigator.globalPrivacyControl === true;
+  var optedOut = navigator.globalPrivacyControl === true || navigator.doNotTrack === "1" || !window.EJ_CONSENT || window.EJ_CONSENT.analytics !== true;
+  try { if (new URLSearchParams(location.search).get("jb_ignore") === "1") localStorage.setItem("jb_ignore", "1"); if (localStorage.getItem("jb_ignore") === "1") optedOut = true; } catch (_) {}
 
   /* ---------- time ---------- */
   function nowMs() {
@@ -42,7 +43,7 @@
 
   /* ---------- storage helpers (never throw) ---------- */
   function ssGet(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
-  function ssSet(k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} }
+  function ssSet(k, v) { if (optedOut) return; try { sessionStorage.setItem(k, v); } catch (e) {} }
 
   function readCookie(name) {
     try {
@@ -65,10 +66,11 @@
   }
 
   /* ---------- session ---------- */
-  var sessionId = readCookie(COOKIE) || ssGet(COOKIE);
+  var sessionId = optedOut ? null : (readCookie(COOKIE) || ssGet(COOKIE));
   var isNewSession = !sessionId;
   if (!sessionId) sessionId = newId();
   function touchSession() {
+    if (optedOut) return;
     writeCookie(COOKIE, sessionId, SESSION_IDLE_MS / 1000); // rolling 30-min idle window
     ssSet(COOKIE, sessionId);
   }
@@ -80,8 +82,8 @@
   if (!source || isNewSession) {
     var q = new URLSearchParams(location.search);
     source = {
-      landing_page: location.pathname + location.search,
-      referrer: document.referrer || null,
+      landing_page: location.pathname,
+      referrer: (function () { try { return document.referrer ? new URL(document.referrer).origin : null; } catch (_) { return null; } })(),
       utm_source: q.get("utm_source"),
       utm_medium: q.get("utm_medium"),
       utm_campaign: q.get("utm_campaign"),
@@ -100,11 +102,12 @@
     touchSession();
     queue.push({
       event: name,
+      event_id: newId(),
       seq: ++seq,
       ts_ms: nowMs(),
       iso: new Date().toISOString(),
       session_id: sessionId,
-      page: location.pathname + location.hash,
+      page: location.pathname,
       data: data || {},
     });
     if (queue.length >= MAX_BATCH) flush(false);
@@ -113,7 +116,7 @@
   function flush(useBeacon) {
     if (!queue.length) return;
     var batch = queue.splice(0, MAX_BATCH);
-    var body = JSON.stringify({ v: 1, site: location.hostname, sent_ts_ms: nowMs(), events: batch });
+    var body = JSON.stringify({ v: 1, batch_id: newId(), site: location.hostname, sent_ts_ms: nowMs(), consent_version: window.EJ_CONSENT && window.EJ_CONSENT.version, events: batch });
 
     if (!ENDPOINT) {
       if (window.console && console.debug) console.debug("[ICP] (no endpoint set)", batch);
@@ -128,14 +131,14 @@
     }
     if (!sent) {
       try {
-        fetch(ENDPOINT, { method: "POST", body: blob, keepalive: true, mode: "cors", credentials: "omit" })
+        fetch(ENDPOINT, { method: "POST", body: blob, keepalive: true, mode: "cors", credentials: "omit" }).then(function (r) { if (!r.ok) throw new Error("ICP delivery " + r.status); })
           .catch(function () { queue = batch.concat(queue).slice(0, 500); }); // retry next flush
       } catch (e) {}
     }
-    if (queue.length) flush(useBeacon);
+    // Drain at most one batch per heartbeat; avoid recursive send storms.
   }
 
-  setInterval(function () { flush(false); }, FLUSH_EVERY_MS);
+  setInterval(function () { if (document.visibilityState === "visible") track("page_heartbeat", {visible_ms: pageClock.read(), max_scroll_pct: pageMaxScroll}); flush(false); }, FLUSH_EVERY_MS);
 
   /* ---------- visible-time clocks ---------- */
   function VisibleClock() {
