@@ -142,7 +142,86 @@
     });
   }
 
+  // Supplier photos reviewed November 5. Empty approved lists mean all supplied
+  // gallery photos were cropped; keep those products out of browsing until replaced.
+  var REVIEWED_MEDIA = {
+  "gid://shopify/Product/15508137672924": {
+    "approved": [
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/e5b704ae02fcbd2c45db291750df11d3-v3-gen-Max-Origin.webp?v=1793851881",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/2ada6b0a05fe7fab5f51ff0f1fc7af9f-v3-gen-Max-Origin.webp?v=1793851881",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/9ba756211a5dbb54146a96e1b80e4748-v3-gen-Max-Origin.webp?v=1793851880",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/ebabb1686afc179168921518fad312eb-v3-gen-Max-Origin.webp?v=1793851881"
+    ],
+    "status": "reviewed"
+  },
+  "gid://shopify/Product/15508137083100": {
+    "approved": [
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/d316dd96-ecd9-450d-a337-06b3e835f5f7-Max-Origin.webp?v=1793851870",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/3036f18c-d695-4ee7-99c0-4c65217f7e9a-Max-Origin.webp?v=1793851869",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/39482e6b-7c49-46fe-abff-6c12e94f40f5-Max-Origin.webp?v=1793851869",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/561577f3-69e0-4061-80d4-1b229ba331f3-Max-Origin.webp?v=1793851869",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/3849ecd7-9413-4577-972a-5a69340be8f4-Max-Origin.webp?v=1793851870",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/39cf0ddd-52f2-4d51-b6c3-18e3290a7abc-Max-Origin.webp?v=1793851870",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/18f3b507-b975-43a2-9f06-643670550f19-Max-Origin.webp?v=1793851870",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/f7a1f16f-a32a-4fd2-9422-e924845c2f21-Max-Origin.webp?v=1793851870",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/7c4c65fb-8d19-4f98-9148-df4a884efa03-Max-Origin.webp?v=1793851869",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/486a4d55-6195-474e-b388-62fbcbacd5ee-Max-Origin.webp?v=1793851870",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/e3757034-fdc6-47af-895a-006bcb94706a-Max-Origin.webp?v=1793851869",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/557c33fc-9c39-4685-b7ec-b7f461ea0fc2-Max-Origin.webp?v=1793851869",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/a9c6999b-c5e0-470f-86b2-b5fe9d7470ef-Max-Origin.webp?v=1793851869",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/1c8a574e-4b80-4366-9da6-f78079bd11ff-Max-Origin.webp?v=1793851870",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/e05eeaa5-526b-483a-86f1-12336e342d52-Max-Origin.webp?v=1793851870",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/9482b562-1591-4f44-b2d3-ea4ad3e2f2eb-Max-Origin.webp?v=1793851870",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/57555438-4b96-4ba8-aec4-76ad01a81efc-Max-Origin.webp?v=1793851870",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/7356b1cc-9862-413c-96de-14e18ef6e506-Max-Origin.webp?v=1793851870",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/e9a44eff-1288-4152-9bde-693b98b2b04e-Max-Origin.webp?v=1793851870",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/b1e10e48-893b-4634-8c1f-c5ec38dc3501-Max-Origin.webp?v=1793851870"
+    ],
+    "status": "reviewed"
+  },
+  "gid://shopify/Product/15508136558812": {
+    "approved": [],
+    "status": "reviewed"
+  },
+  "gid://shopify/Product/15508136165596": {
+    "approved": [
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/67da1e9bae4047978776c1ecc7d21fda-Max.jpg?v=1793851850",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/e5f8be862b964398b92c7fb65c2888b6-Max.jpg?v=1793851851",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/8c578117038f48d58764c1c9a1ec2369-Max.jpg?v=1793851851",
+      "https://cdn.shopify.com/s/files/1/0867/3899/3372/files/bdd5a255a6974775a0d656d0de3ecd72-Max.jpg?v=1793851851"
+    ],
+    "status": "reviewed"
+  },
+  "gid://shopify/Product/15508135248092": {
+    "approved": [],
+    "status": "reviewed"
+  },
+  "gid://shopify/Product/15508133052636": {
+    "approved": [],
+    "status": "reviewed"
+  },
+  "gid://shopify/Product/15508130005212": {
+    "approved": [],
+    "status": "reviewed"
+  },
+  "gid://shopify/Product/15508127121628": {
+    "approved": [],
+    "status": "reviewed"
+  }
+};
+  function mediaKey(url) { try { return new URL(url).pathname.replace(/_(?:[0-9]+x[0-9]*)(?=\.)/, ""); } catch (_) { return url; } }
+  function approvedMedia(id, url) {
+    var review = REVIEWED_MEDIA[id];
+    return !review || review.approved.some(function (u) { return mediaKey(u) === mediaKey(url); });
+  }
   function normalize(p, deptTitle) {
+    var review = REVIEWED_MEDIA[p.id];
+    if (review) {
+      var supplied = (p.images && p.images.nodes) || [];
+      var approved = supplied.filter(function (im) { return approvedMedia(p.id, im.url); });
+      p.images = { nodes: approved };
+      p.featuredImage = approved[0] || null;
+    }
     var variants = (p.variants && p.variants.nodes) || [];
     var min = p.priceRange.minVariantPrice;
     var cmp = p.compareAtPriceRange && p.compareAtPriceRange.minVariantPrice;
@@ -151,6 +230,7 @@
       dept: deptTitle || p.productType || "",
       available: p.availableForSale,
       descriptionHtml: p.descriptionHtml,
+      mediaBlocked: Boolean(review && !review.approved.length),
       image: p.featuredImage ? p.featuredImage.url : null,
       imageAlt: p.title,
       imageWidth: p.featuredImage && p.featuredImage.width,
@@ -165,7 +245,7 @@
           id: v.id, title: v.title, available: v.availableForSale, qty: v.quantityAvailable == null ? null : v.quantityAvailable,
           price: Number(v.price.amount), currency: v.price.currencyCode,
           compareAt: v.compareAtPrice ? Number(v.compareAtPrice.amount) : null,
-          options: v.selectedOptions, image: v.image ? v.image.url : null,
+          options: v.selectedOptions, image: v.image && approvedMedia(p.id, v.image.url) ? v.image.url : null,
         };
       }),
       sample: false,
@@ -220,7 +300,7 @@
     "id checkoutUrl totalQuantity cost { subtotalAmount { amount currencyCode } } " +
     "lines(first: 100) { nodes { id quantity cost { totalAmount { amount currencyCode } } " +
     "  merchandise { ... on ProductVariant { id title image { url(transform:{maxWidth:160}) } " +
-    "    price { amount currencyCode } product { title handle productType } } } } }";
+    "    price { amount currencyCode } product { id title handle productType } } } } }";
 
   function cartFromApi(c) {
     if (!c) return null;
@@ -231,7 +311,7 @@
         var m = l.merchandise;
         return {
           id: l.id, qty: l.quantity, variantId: m.id, title: m.product.title, dept: m.product.productType,
-          variant: m.title === "Default Title" ? "" : m.title, image: m.image ? m.image.url : null,
+          variant: m.title === "Default Title" ? "" : m.title, image: m.image && approvedMedia(m.product.id, m.image.url) ? m.image.url : null,
           lineTotal: Number(l.cost.totalAmount.amount), currency: l.cost.totalAmount.currencyCode,
         };
       }),
@@ -476,7 +556,7 @@
     job.then(function (res) {
       var before = state.items.length;
       var lo = Number(CFG.priceMin || 0), hi = Number(CFG.priceMax || 0);
-      var fresh = res.items.filter(function (p) { return (!lo || p.price >= lo) && (!hi || p.price <= hi); });
+      var fresh = res.items.filter(function (p) { return !p.mediaBlocked && (!lo || p.price >= lo) && (!hi || p.price <= hi); });
       state.items = more ? state.items.concat(fresh) : fresh;
       state.next = res.next;
       renderGrid(more ? before : 0);
@@ -810,3 +890,4 @@
   Cart.load().then(function (c) { state.cart = c; renderCart(); }).catch(function () { state.cart = null; renderCart(); });
   renderCart();
 })();
+
