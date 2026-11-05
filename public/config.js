@@ -20,8 +20,8 @@ window.EJ_CONFIG = {
   // Your back end's address (filled in after Render is set up). No trailing slash.
   apiBase: "",
 
-  // Where the ICP beacon sends events (filled in after Render is set up)
-  icpEndpoint: "",
+  // Dedicated public Make analytics webhook. Telemetry only; never proof of payment.
+  icpEndpoint: "https://hook.us2.make.com/11n6hwxmgsb3wophsx2phn300d1h3xan",
 
   // Use ".everydayjitney.com" once the domain is connected
   cookieDomain: "",
