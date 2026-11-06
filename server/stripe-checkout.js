@@ -168,11 +168,20 @@ async function createCheckout(body) {
     });
   }
   if (!items.length) { const e = new Error("Those items are no longer available."); e.status = 409; throw e; }
+  // Never charge for an incomplete catalog listing with a zero/invalid price.
+  if (items.some((i) => !Number.isSafeInteger(i.unitCents) || i.unitCents < 50)) {
+    const e = new Error("An item has an invalid checkout price. Please remove it and try again.");
+    e.status = 409;
+    throw e;
+  }
   if (new Set(items.map((i) => i.currency)).size > 1) { const e = new Error("Mixed currencies in cart."); e.status = 400; throw e; }
 
   const icpSessionId = typeof body.icpSessionId === "string" ? body.icpSessionId.slice(0, 80) : "";
   const { params, subtotalCents, currency } = buildSessionParams(items, icpSessionId);
-  const idem = require("crypto").createHash("sha256").update(JSON.stringify(params) + Math.floor(Date.now() / 60000)).digest("hex");
+  // A cart-based idempotency key would make two unrelated shoppers share one
+  // Stripe Checkout Session if they purchase the same items in the same minute.
+  // Use a distinct key for each initiated checkout instead.
+  const idem = require("crypto").randomUUID();
   const session = await stripePost("checkout/sessions", params, idem);
 
   return {
