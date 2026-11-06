@@ -82,6 +82,7 @@ app.get("/api/health", (_req, res) => {
     salesLedgerForwarding: Boolean(process.env.MAKE_SALES_WEBHOOK_URL),
     icpForwarding: Boolean(MAKE_ICP_WEBHOOK_URL),
     orderForwarding: Boolean(MAKE_ORDERS_WEBHOOK_URL),
+    paymentPipelineConfigured: Boolean(process.env.STRIPE_WEBHOOK_SECRET && process.env.SHOPIFY_ADMIN_TOKEN && process.env.MAKE_SALES_WEBHOOK_URL && MAKE_ORDERS_WEBHOOK_URL),
     webhookSecretSet: Boolean(SHOPIFY_WEBHOOK_SECRET),
     time: new Date().toISOString(),
   });
@@ -147,6 +148,12 @@ app.post(
 /* ---------------- Stripe checkout ---------------- */
 app.options("/api/checkout", cors);
 app.post("/api/checkout", cors, rateLimit(30), express.json({ limit: "32kb" }), async (req, res) => {
+  // Fail closed: never initiate a new payment unless the signed webhook, paid
+  // Shopify order creation and both accounting/notification destinations are set.
+  if (!process.env.STRIPE_WEBHOOK_SECRET || !process.env.SHOPIFY_ADMIN_TOKEN ||
+      !process.env.MAKE_SALES_WEBHOOK_URL || !MAKE_ORDERS_WEBHOOK_URL) {
+    return res.status(503).json({ error: "Checkout is being configured. Please try again later." });
+  }
   try {
     const { url, event } = await stripeCheckout.createCheckout(req.body || {});
     res.json({ url });
