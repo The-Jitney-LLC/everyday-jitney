@@ -884,7 +884,7 @@
     if (status === "success") {
       ICP.track("checkout_return", { status: "success", stripe_session_id: q.get("session_id") });
       lsDel(CART_KEY); lsDel(PREVIEW_CART_KEY); previewCart = [];
-      setTimeout(function () { toast("Thank you! Your order is in. A receipt is on its way to your email."); }, 300);
+      setTimeout(function () { toast("Returned from checkout. Payment confirmation will follow by email once verified."); }, 300);
     } else {
       ICP.track("checkout_return", { status: "cancelled" });
       setTimeout(function () { toast("Checkout cancelled. Your cart is still here."); }, 300);
