@@ -5,10 +5,19 @@
  * - 8-second timeout, one retry after 2 seconds.
  * - With no URL set, logs the payload instead (useful for local testing).
  */
+// Make webhooks with "API key authentication" turned on reject requests that lack
+// the x-make-apikey header (HTTP 401 "Unauthorized."). The key lives only in Render.
+function makeHeaders() {
+  const h = { "Content-Type": "application/json" };
+  const key = process.env.MAKE_WEBHOOK_API_KEY || "";
+  if (key) h["x-make-apikey"] = key;
+  return h;
+}
+
 async function postJson(url, payload) {
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: makeHeaders(),
     body: JSON.stringify(payload),
     signal: AbortSignal.timeout(8000),
   });
@@ -38,4 +47,4 @@ async function forward(url, payload, label, { required = false } = {}) {
   }
 }
 
-module.exports = { forward };
+module.exports = { forward, makeHeaders };

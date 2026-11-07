@@ -80,6 +80,7 @@ app.get("/api/health", (_req, res) => {
     stripeWebhookSecretSet: Boolean(process.env.STRIPE_WEBHOOK_SECRET),
     shopifyAdminTokenSet: Boolean(process.env.SHOPIFY_ADMIN_TOKEN),
     salesLedgerForwarding: Boolean(process.env.MAKE_SALES_WEBHOOK_URL),
+    makeApiKeySet: Boolean(process.env.MAKE_WEBHOOK_API_KEY),
     icpForwarding: Boolean(MAKE_ICP_WEBHOOK_URL),
     orderForwarding: Boolean(MAKE_ORDERS_WEBHOOK_URL),
     paymentPipelineConfigured: Boolean(process.env.STRIPE_WEBHOOK_SECRET && process.env.SHOPIFY_ADMIN_TOKEN && process.env.MAKE_SALES_WEBHOOK_URL && MAKE_ORDERS_WEBHOOK_URL),
