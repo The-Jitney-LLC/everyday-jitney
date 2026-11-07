@@ -384,7 +384,7 @@ async function handleSale(event) {
   }
   sale.notes = sale.notes.join(". ");
 
-  await forward(MAKE_SALES_WEBHOOK_URL(), ledgerRow(sale), "sales-ledger");
+  await forward(MAKE_SALES_WEBHOOK_URL(), ledgerRow(sale), "sales-ledger", { required: true });
   forward(MAKE_ORDERS_WEBHOOK_URL(), {
     type: "commerce_event", provider: "stripe", event: "payment_succeeded",
     stripe_checkout_session_id: sale.stripe_checkout_session_id, stripe_payment_intent_id: sale.stripe_payment_intent_id,
@@ -437,7 +437,7 @@ async function handleRefund(event) {
     recorded_at: new Date().toISOString(),
   };
   await tagShopifyOrder(order.id, ["stripe-refunded"]);
-  await forward(MAKE_SALES_WEBHOOK_URL(), ledgerRow(rec), "sales-ledger");
+  await forward(MAKE_SALES_WEBHOOK_URL(), ledgerRow(rec), "sales-ledger", { required: true });
   forward(MAKE_ORDERS_WEBHOOK_URL(), { type: "commerce_event", provider: "stripe", event: "refunded", amount: cents(refundedNow), stripe_charge_id: ch.id, shopify_order_id: order.id || null }, "orders");
   return { recorded: rec.record_id };
 }
@@ -465,7 +465,7 @@ async function handleDispute(event) {
     recorded_at: new Date().toISOString(),
   };
   await tagShopifyOrder(order.id, ["stripe-dispute"]);
-  await forward(MAKE_SALES_WEBHOOK_URL(), ledgerRow(rec), "sales-ledger");
+  await forward(MAKE_SALES_WEBHOOK_URL(), ledgerRow(rec), "sales-ledger", { required: true });
   forward(MAKE_ORDERS_WEBHOOK_URL(), { type: "commerce_event", provider: "stripe", event: "disputed", amount: cents(d.amount), reason: d.reason, shopify_order_id: order.id || null }, "orders");
   return { recorded: rec.record_id };
 }
@@ -481,27 +481,45 @@ const HANDLERS = {
    Express handler
    ================================================================ */
 const seen = new Set();
-function stripeWebhookHandler(req, res) {
-  if (!verifyStripeSignature(req.body, req.get("Stripe-Signature"), STRIPE_WEBHOOK_SECRET())) return res.sendStatus(400);
+const inFlight = new Map();
+async function stripeWebhookHandler(req, res) {
+  if (!verifyStripeSignature(req.body, req.get("Stripe-Signature"), STRIPE_WEBHOOK_SECRET())) {
+    return res.sendStatus(400);
+  }
   let event;
-  try { event = JSON.parse(req.body.toString("utf8")); } catch (_) { return res.sendStatus(400); }
+  try { event = JSON.parse(req.body.toString("utf8")); }
+  catch (_) { return res.sendStatus(400); }
+  if (!event || typeof event.id !== "string" || !event.data || !event.data.object) {
+    return res.sendStatus(400);
+  }
 
-  // Only events from this store's own checkout (other Stripe traffic is ignored)
   const handler = HANDLERS[event.type];
   if (!handler || seen.has(event.id)) return res.sendStatus(200);
-  if (event.type.startsWith("checkout.session") && !(event.data.object.metadata && event.data.object.metadata.source === "everydayjitney.com")) {
+  if (event.type.startsWith("checkout.session") &&
+      !(event.data.object.metadata && event.data.object.metadata.source === "everydayjitney.com")) {
     return res.sendStatus(200);
   }
-  seen.add(event.id);
-  if (seen.size > 5000) seen.delete(seen.values().next().value);
 
-  res.sendStatus(200); // acknowledge fast; Stripe retries otherwise
-  handler(event)
-    .then((r) => console.log(`[stripe-webhook] ${event.type} ${event.id}`, r))
-    .catch((err) => {
-      seen.delete(event.id);
-      console.error(`[stripe-webhook] ${event.type} ${event.id} failed:`, err.message);
-    });
+  // Only acknowledge Stripe after critical ledger forwarding succeeds. An HTTP
+  // 5xx requests a retry rather than silently losing a paid order on restart.
+  // Share pending work for concurrent deliveries with the same event ID.
+  let task = inFlight.get(event.id);
+  if (!task) {
+    task = Promise.resolve().then(() => handler(event));
+    inFlight.set(event.id, task);
+  }
+  try {
+    const result = await task;
+    seen.add(event.id);
+    if (seen.size > 5000) seen.delete(seen.values().next().value);
+    console.log(`[stripe-webhook] ${event.type} ${event.id}`, result);
+    return res.sendStatus(200);
+  } catch (err) {
+    console.error(`[stripe-webhook] ${event.type} ${event.id} failed:`, err.message);
+    return res.sendStatus(500);
+  } finally {
+    if (inFlight.get(event.id) === task) inFlight.delete(event.id);
+  }
 }
 
 module.exports = { stripeWebhookHandler, verifyStripeSignature, ledgerRow, LEDGER_COLUMNS, localTime };
