@@ -7,9 +7,14 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "SERVE_STATIC=true node --watch server/index.js",
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "audit:prod": "npm audit --omit=dev --audit-level=moderate"
   },
-  "engines": { "node": ">=20.12" },
-  "dependencies": { "express": "4.21.2" },
+  "engines": {
+    "node": ">=20.12"
+  },
+  "dependencies": {
+    "express": "4.22.3"
+  },
   "license": "UNLICENSED"
 }
