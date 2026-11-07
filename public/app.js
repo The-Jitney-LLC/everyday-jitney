@@ -323,6 +323,13 @@
   }
   function userErr(res) {
     if (res && res.userErrors && res.userErrors.length) throw new Error(res.userErrors[0].message);
+    // Shopify drops unsellable lines (e.g. MERCHANDISE_OUT_OF_STOCK) and reports them only
+    // as warnings; never tell a shopper an item was added when it was not.
+    if (res && res.warnings && res.warnings.length) {
+      var e = new Error(res.warnings[0].message || "That item can't be added right now.");
+      e.cartWarning = res.warnings[0].code || "WARNING";
+      throw e;
+    }
     return res;
   }
   var LiveCart = {
@@ -337,7 +344,7 @@
     add: function (variantId, qty) {
       var id = lsGet(CART_KEY);
       if (!id) {
-        return sf("mutation($i:CartInput!){ cartCreate(input:$i){ cart{ " + CART_FIELDS + " } userErrors{ message } } }", {
+        return sf("mutation($i:CartInput!){ cartCreate(input:$i){ cart{ " + CART_FIELDS + " } userErrors{ message } warnings{ code message } } }", {
           i: {
             lines: [{ merchandiseId: variantId, quantity: qty }],
             // Ties the order back to the ICP session (arrives on the order webhook as a note attribute).
@@ -349,7 +356,7 @@
           return cartFromApi(d.cartCreate.cart);
         });
       }
-      return sf("mutation($c:ID!,$l:[CartLineInput!]!){ cartLinesAdd(cartId:$c, lines:$l){ cart{ " + CART_FIELDS + " } userErrors{ message } } }", {
+      return sf("mutation($c:ID!,$l:[CartLineInput!]!){ cartLinesAdd(cartId:$c, lines:$l){ cart{ " + CART_FIELDS + " } userErrors{ message } warnings{ code message } } }", {
         c: id, l: [{ merchandiseId: variantId, quantity: qty }],
       }).then(function (d) {
         if (!d.cartLinesAdd.cart) { lsDel(CART_KEY); return LiveCart.add(variantId, qty); }
@@ -363,7 +370,7 @@
         return sf("mutation($c:ID!,$l:[ID!]!){ cartLinesRemove(cartId:$c, lineIds:$l){ cart{ " + CART_FIELDS + " } userErrors{ message } } }", { c: id, l: [lineId] })
           .then(function (d) { userErr(d.cartLinesRemove); return cartFromApi(d.cartLinesRemove.cart); });
       }
-      return sf("mutation($c:ID!,$l:[CartLineUpdateInput!]!){ cartLinesUpdate(cartId:$c, lines:$l){ cart{ " + CART_FIELDS + " } userErrors{ message } } }", { c: id, l: [{ id: lineId, quantity: qty }] })
+      return sf("mutation($c:ID!,$l:[CartLineUpdateInput!]!){ cartLinesUpdate(cartId:$c, lines:$l){ cart{ " + CART_FIELDS + " } userErrors{ message } warnings{ code message } } }", { c: id, l: [{ id: lineId, quantity: qty }] })
         .then(function (d) { userErr(d.cartLinesUpdate); return cartFromApi(d.cartLinesUpdate.cart); });
     },
   };
@@ -737,7 +744,7 @@
       ICP.track("add_to_cart", { product_id: product.id, variant_id: variant.id, title: product.title, variant: variant.title, qty: qty, price: variant.price });
     }).catch(function (err) {
       console.error(err);
-      toast("Couldn't add that item. Please try again.");
+      toast(err && err.cartWarning ? "Sorry, that item is sold out right now." : "Couldn't add that item. Please try again.");
     }).then(function () {
       if (btn) { btn.disabled = false; btn.textContent = btn.dataset.label; }
     });
