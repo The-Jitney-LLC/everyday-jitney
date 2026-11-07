@@ -30,6 +30,7 @@ const { forward } = require("./forward");
 const { normalizeShopifyEvent } = require("./shopify-events");
 const stripeCheckout = require("./stripe-checkout");
 const { stripeWebhookHandler } = require("./stripe-webhook");
+const shopifyAuth = require("./shopify-admin-auth");
 
 const PORT = Number(process.env.PORT || 8787);
 const ALLOWED_ORIGINS = String(process.env.ALLOWED_ORIGINS || "")
@@ -78,12 +79,13 @@ app.get("/api/health", (_req, res) => {
     ok: true,
     checkout: stripeCheckout.configured() ? "stripe" : "not configured",
     stripeWebhookSecretSet: Boolean(process.env.STRIPE_WEBHOOK_SECRET),
-    shopifyAdminTokenSet: Boolean(process.env.SHOPIFY_ADMIN_TOKEN),
+    shopifyAdminTokenSet: shopifyAuth.adminConfigured(),
+    shopifyAdminAuth: shopifyAuth.authMode(),
     salesLedgerForwarding: Boolean(process.env.MAKE_SALES_WEBHOOK_URL),
     makeApiKeySet: Boolean(process.env.MAKE_WEBHOOK_API_KEY),
     icpForwarding: Boolean(MAKE_ICP_WEBHOOK_URL),
     orderForwarding: Boolean(MAKE_ORDERS_WEBHOOK_URL),
-    paymentPipelineConfigured: Boolean(process.env.STRIPE_WEBHOOK_SECRET && process.env.SHOPIFY_ADMIN_TOKEN && process.env.MAKE_SALES_WEBHOOK_URL && MAKE_ORDERS_WEBHOOK_URL),
+    paymentPipelineConfigured: Boolean(process.env.STRIPE_WEBHOOK_SECRET && shopifyAuth.adminConfigured() && process.env.MAKE_SALES_WEBHOOK_URL && MAKE_ORDERS_WEBHOOK_URL),
     webhookSecretSet: Boolean(SHOPIFY_WEBHOOK_SECRET),
     time: new Date().toISOString(),
   });
@@ -151,7 +153,7 @@ app.options("/api/checkout", cors);
 app.post("/api/checkout", cors, rateLimit(30), express.json({ limit: "32kb" }), async (req, res) => {
   // Fail closed: never initiate a new payment unless the signed webhook, paid
   // Shopify order creation and both accounting/notification destinations are set.
-  if (!process.env.STRIPE_WEBHOOK_SECRET || !process.env.SHOPIFY_ADMIN_TOKEN ||
+  if (!process.env.STRIPE_WEBHOOK_SECRET || !shopifyAuth.adminConfigured() ||
       !process.env.MAKE_SALES_WEBHOOK_URL || !MAKE_ORDERS_WEBHOOK_URL) {
     return res.status(503).json({ error: "Checkout is being configured. Please try again later." });
   }

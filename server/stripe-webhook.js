@@ -23,11 +23,11 @@
 
 const crypto = require("crypto");
 const { forward } = require("./forward");
+const { getAdminToken, invalidateAdminToken, adminConfigured } = require("./shopify-admin-auth");
 
 const STRIPE_SECRET_KEY = () => process.env.STRIPE_SECRET_KEY || "";
 const STRIPE_WEBHOOK_SECRET = () => process.env.STRIPE_WEBHOOK_SECRET || "";
 const SHOP = () => process.env.SHOPIFY_STORE_DOMAIN || "";
-const SHOP_ADMIN_TOKEN = () => process.env.SHOPIFY_ADMIN_TOKEN || "";
 const SHOP_API_VERSION = () => process.env.SHOPIFY_API_VERSION || "2026-07";
 const MAKE_SALES_WEBHOOK_URL = () => process.env.MAKE_SALES_WEBHOOK_URL || "";
 const MAKE_ORDERS_WEBHOOK_URL = () => process.env.MAKE_ORDERS_WEBHOOK_URL || "";
@@ -91,13 +91,14 @@ async function stripePost(path, params) {
 /* ================================================================
    Shopify Admin API helpers
    ================================================================ */
-async function shopifyAdmin(query, variables) {
+async function shopifyAdmin(query, variables, retried = false) {
   const res = await fetch(`https://${SHOP()}/admin/api/${SHOP_API_VERSION()}/graphql.json`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", "X-Shopify-Access-Token": SHOP_ADMIN_TOKEN() },
+    headers: { "Content-Type": "application/json", "X-Shopify-Access-Token": await getAdminToken() },
     body: JSON.stringify({ query, variables }),
     signal: AbortSignal.timeout(15000),
   });
+  if (res.status === 401 && !retried) { invalidateAdminToken(); return shopifyAdmin(query, variables, true); }
   if (!res.ok) throw new Error(`Shopify Admin ${res.status}`);
   const json = await res.json();
   if (json.errors && json.errors.length) throw new Error(json.errors[0].message);
@@ -105,7 +106,7 @@ async function shopifyAdmin(query, variables) {
 }
 
 async function variantCosts(variantIds) {
-  if (!SHOP_ADMIN_TOKEN() || !variantIds.length) return {};
+  if (!adminConfigured() || !variantIds.length) return {};
   try {
     const d = await shopifyAdmin(
       `query($ids:[ID!]!){ nodes(ids:$ids){ ... on ProductVariant { id sku inventoryItem { unitCost { amount } } } } }`,
@@ -192,7 +193,7 @@ async function createShopifyOrder(sale) {
 }
 
 async function tagShopifyOrder(orderId, tags) {
-  if (!SHOP_ADMIN_TOKEN() || !orderId) return;
+  if (!adminConfigured() || !orderId) return;
   try {
     await shopifyAdmin(`mutation($id:ID!,$tags:[String!]!){ tagsAdd(id:$id, tags:$tags){ userErrors { message } } }`, { id: orderId, tags });
   } catch (err) {
@@ -362,8 +363,8 @@ async function handleSale(event) {
     sale.shopify_order_id = existing;
     sale.shopify_order_name = pi.metadata.shopify_order_name || "";
     sale.shopify_status = "Already created";
-  } else if (!SHOP_ADMIN_TOKEN()) {
-    sale.shopify_status = "NOT CREATED: Shopify admin token not set";
+  } else if (!adminConfigured()) {
+    sale.shopify_status = "NOT CREATED: Shopify Admin API access not configured";
   } else if (!sale.items.some((i) => i.variant_id)) {
     sale.shopify_status = "NOT CREATED: no Shopify variants on this payment";
   } else {
