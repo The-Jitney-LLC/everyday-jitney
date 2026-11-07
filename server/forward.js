@@ -15,20 +15,25 @@ async function postJson(url, payload) {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 }
 
-async function forward(url, payload, label) {
+async function forward(url, payload, label, { required = false } = {}) {
   if (!url) {
-    console.log(`[${label}] (no Make URL set)`, JSON.stringify(payload).slice(0, 2000));
-    return;
+    if (required) throw new Error(`[${label}] required Make webhook URL is missing`);
+    console.warn(`[${label}] Make webhook URL is missing; event not delivered`);
+    return false;
   }
   try {
     await postJson(url, payload);
+    return true;
   } catch (err) {
     console.warn(`[${label}] forward failed (${err.message}); retrying once`);
     await new Promise((r) => setTimeout(r, 2000));
     try {
       await postJson(url, payload);
+      return true;
     } catch (err2) {
       console.error(`[${label}] forward failed twice: ${err2.message}`);
+      if (required) throw err2;
+      return false;
     }
   }
 }
