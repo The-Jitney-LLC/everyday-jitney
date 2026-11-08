@@ -83,6 +83,7 @@ app.get("/api/health", (_req, res) => {
     shopifyAdminAuth: shopifyAuth.authMode(),
     salesLedgerForwarding: Boolean(process.env.MAKE_SALES_WEBHOOK_URL),
     makeApiKeySet: Boolean(process.env.MAKE_WEBHOOK_API_KEY),
+    salesTax: String(process.env.STRIPE_AUTOMATIC_TAX).toLowerCase() === "true" ? "stripe_tax" : (process.env.STRIPE_TAX_RATE_IDS ? "tax_rates" : "off"),
     icpForwarding: Boolean(MAKE_ICP_WEBHOOK_URL),
     orderForwarding: Boolean(MAKE_ORDERS_WEBHOOK_URL),
     paymentPipelineConfigured: Boolean(process.env.STRIPE_WEBHOOK_SECRET && shopifyAuth.adminConfigured() && process.env.MAKE_SALES_WEBHOOK_URL && MAKE_ORDERS_WEBHOOK_URL),

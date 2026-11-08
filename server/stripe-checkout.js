@@ -115,10 +115,18 @@ function buildSessionParams(items, icpSessionId) {
     billing_address_collection: "auto",
   };
 
-  // Stripe Tax: calculates and collects sales tax where you're registered (e.g. Michigan 6%).
-  // Turn on only after adding your tax registrations in Stripe Dashboard > Tax.
+  // Sales tax, two ways (never both; Stripe rejects the combination):
+  //  1. STRIPE_AUTOMATIC_TAX=true  -> Stripe Tax (paid add-on; add registrations in Dashboard > Tax).
+  //  2. STRIPE_TAX_RATE_IDS=txr_... -> your own tax rates (e.g. "Michigan 6%", country US, state MI).
+  //     Passed as dynamic tax rates, so Stripe applies a rate only when the customer's
+  //     shipping address matches that rate's state. Out-of-state orders are not charged it.
+  const taxRateIds = dynamicTaxRateIds();
   if (String(process.env.STRIPE_AUTOMATIC_TAX).toLowerCase() === "true") {
     params.automatic_tax = { enabled: true };
+  } else if (taxRateIds.length) {
+    Object.values(lineItems).forEach((li) => {
+      li.dynamic_tax_rates = Object.fromEntries(taxRateIds.map((id, n) => [n, id]));
+    });
   }
 
   if (FLAT_SHIPPING_CENTS > 0) {
@@ -134,6 +142,11 @@ function buildSessionParams(items, icpSessionId) {
     };
   }
   return { params, subtotalCents, currency };
+}
+
+function dynamicTaxRateIds() {
+  return String(process.env.STRIPE_TAX_RATE_IDS || "")
+    .split(",").map((x) => x.trim()).filter((x) => /^txr_[A-Za-z0-9]+$/.test(x)).slice(0, 5);
 }
 
 async function createCheckout(body) {
