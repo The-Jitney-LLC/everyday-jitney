@@ -3,8 +3,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Everyday Jitney</title>
-  <meta name="description" content="Everyday Jitney by The Jitney LLC: phone accessories, kitchen tools, home goods, beauty and apparel, with secure checkout." />
+  <title>Everyday Jitney | The Jitney LLC</title>
+  <meta name="description" content="Everyday Jitney by The Jitney LLC, a Detroit-rooted Michigan company: apparel, dresses, denim, home and kitchen, beauty and pet supplies. Shop online and pay on Stripe's secure checkout." />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <link rel="canonical" href="https://www.everydayjitney.com/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Everyday Jitney" />
+  <meta property="og:title" content="Everyday Jitney | The Jitney LLC" />
+  <meta property="og:description" content="Everyday essentials from The Jitney LLC. Shop apparel, home, beauty and pet supplies with secure Stripe checkout." />
+  <meta property="og:url" content="https://www.everydayjitney.com/" />
+  <meta property="og:image" content="https://www.everydayjitney.com/assets/jitney-logo.svg" />
+  <meta name="twitter:card" content="summary" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://www.everydayjitney.com/#org",
+        "name": "The Jitney LLC",
+        "url": "https://www.everydayjitney.com/",
+        "logo": "https://www.everydayjitney.com/assets/jitney-logo.svg",
+        "email": "thejitney4u@gmail.com",
+        "address": { "@type": "PostalAddress", "addressRegion": "MI", "addressCountry": "US" }
+      },
+      {
+        "@type": "OnlineStore",
+        "name": "Everyday Jitney",
+        "url": "https://www.everydayjitney.com/",
+        "parentOrganization": { "@id": "https://www.everydayjitney.com/#org" },
+        "paymentAccepted": "Credit card, debit card (Stripe secure checkout)",
+        "currenciesAccepted": "USD"
+      },
+      {
+        "@type": "WebSite",
+        "name": "Everyday Jitney",
+        "url": "https://www.everydayjitney.com/",
+        "publisher": { "@id": "https://www.everydayjitney.com/#org" }
+      }
+    ]
+  }
+  </script>
   <link rel="icon" href="assets/jitney-logo.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -82,11 +121,9 @@
       </div>
     </section>
 
-    <div class="wrap" id="previewNote" hidden>
-      <div class="preview-note">
-        <strong>Catalog temporarily unavailable.</strong>
-        Product listings could not be loaded right now. Please refresh the page or contact customer support if the issue continues.
-      </div>
+    <!-- Status note: empty in the page source so search engines never index it; app.js fills it only if the catalog fails to load. -->
+    <div class="wrap" id="previewNote" hidden data-nosnippet>
+      <div class="preview-note" id="previewNoteText"></div>
     </div>
 
     <!-- Catalog -->
@@ -165,7 +202,7 @@
       <div class="subtotal"><span>Subtotal</span><strong id="cartSubtotal">$0.00</strong></div>
       <p class="fine">Shipping and tax are calculated at checkout.</p>
       <button class="btn btn-primary btn-block" id="checkoutBtn" type="button">Check out securely</button>
-      <p class="fine center" id="checkoutHint"></p>
+      <p class="fine center" id="checkoutHint" data-nosnippet></p>
     </div>
   </aside>
 
