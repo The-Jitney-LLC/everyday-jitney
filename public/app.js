@@ -865,6 +865,9 @@
      ================================================================ */
   $("#year").textContent = new Date().getFullYear();
   $("#supportEmail").textContent = CFG.supportEmail || "";
+  if (!LIVE) {
+    $("#previewNoteText").innerHTML = "<strong>Catalog temporarily unavailable.</strong> Product listings could not be loaded right now. Please refresh the page or contact customer support if the issue continues.";
+  }
   $("#previewNote").hidden = LIVE;
 
   function renderPolicies(shop) {
