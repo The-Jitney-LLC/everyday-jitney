@@ -550,7 +550,9 @@
       grid.innerHTML = state.items.map(cardHtml).join("");
     }
     $("#catalogTitle").textContent = state.query ? "Results for “" + state.query + "”" : state.collectionTitle;
-    $("#catalogCount").textContent = state.items.length ? state.items.length + (state.next ? "+" : "") + " product" + (state.items.length === 1 ? "" : "s") : "";
+    $("#catalogCount").textContent = !state.items.length ? ""
+      : state.next ? "Showing " + state.items.length + " products · scroll for more"
+      : state.items.length + " product" + (state.items.length === 1 ? "" : "s");
     $("#loadMore").hidden = !state.next;
   }
 
@@ -576,7 +578,22 @@
     }).catch(function (err) {
       console.error(err);
       $("#grid").innerHTML = '<div class="empty">We couldn’t load products right now. Refresh the page to try again.</div>';
-    }).then(function () { state.loading = false; });
+    }).then(function () { state.loading = false; autoLoadIfNear(); });
+  }
+
+  // Load the next page on its own when the shopper scrolls near the end of the grid.
+  // The "Show more products" button stays as a fallback.
+  function autoLoadIfNear() {
+    var btn = $("#loadMore");
+    if (!btn || btn.hidden || state.loading || !state.next) return;
+    if (btn.getBoundingClientRect().top < window.innerHeight + 800) loadProducts(true);
+  }
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) autoLoadIfNear();
+    }, { rootMargin: "0px 0px 800px 0px" }).observe($("#loadMore"));
+  } else {
+    window.addEventListener("scroll", autoLoadIfNear, { passive: true });
   }
 
   function previewFetch(opts) {
