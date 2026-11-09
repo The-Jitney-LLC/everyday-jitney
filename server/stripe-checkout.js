@@ -22,6 +22,11 @@ const SITE_URL = (process.env.SITE_URL || "https://www.everydayjitney.com").repl
 const SHIP_COUNTRIES = String(process.env.SHIP_COUNTRIES || "US").split(",").map((s) => s.trim()).filter(Boolean);
 const FLAT_SHIPPING_CENTS = Number(process.env.FLAT_SHIPPING_CENTS || 0);
 const FREE_SHIPPING_OVER_CENTS = Number(process.env.FREE_SHIPPING_OVER_CENTS || 0);
+// Big & tall line shipped by S&S Activewear: S&S charges us freight under $200, so the
+// customer pays SS_SHIPPING_CENTS unless the S&S items in the cart total $200 or more.
+const SS_VENDOR = String(process.env.SS_VENDOR || "S&S Activewear").toLowerCase();
+const SS_SHIPPING_CENTS = Number(process.env.SS_SHIPPING_CENTS || 999);
+const SS_FREE_OVER_CENTS = Number(process.env.SS_FREE_OVER_CENTS || 20000);
 
 const MAX_LINES = 40;
 const MAX_QTY = 20;
@@ -129,7 +134,21 @@ function buildSessionParams(items, icpSessionId) {
     });
   }
 
-  if (FLAT_SHIPPING_CENTS > 0) {
+  const ssCents = items
+    .filter((i) => String(i.vendor || "").toLowerCase() === SS_VENDOR)
+    .reduce((s, i) => s + i.unitCents * i.quantity, 0);
+  if (ssCents > 0 && SS_SHIPPING_CENTS > 0) {
+    const free = ssCents >= SS_FREE_OVER_CENTS;
+    params.shipping_options = {
+      0: {
+        shipping_rate_data: {
+          type: "fixed_amount",
+          display_name: free ? "Free shipping (big & tall orders over $200)" : "Big & tall shipping (free over $200)",
+          fixed_amount: { amount: free ? 0 : SS_SHIPPING_CENTS, currency },
+        },
+      },
+    };
+  } else if (FLAT_SHIPPING_CENTS > 0) {
     const free = FREE_SHIPPING_OVER_CENTS > 0 && subtotalCents >= FREE_SHIPPING_OVER_CENTS;
     params.shipping_options = {
       0: {
