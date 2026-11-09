@@ -777,7 +777,7 @@
     if (t.hasAttribute("data-collection")) {
       e.preventDefault();
       setCollection(t.getAttribute("data-collection"));
-      if (t.closest(".ticket") || t.closest(".brand")) $("#catalog").scrollIntoView({ behavior: "smooth" });
+      if (t.closest(".ticket") || t.closest(".brand") || t.closest(".feature")) $("#catalog").scrollIntoView({ behavior: "smooth" });
       return;
     }
     if (t.dataset.open) { openProduct(t.dataset.open, t); return; }
