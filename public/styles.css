@@ -132,6 +132,15 @@ a { color: var(--navy); }
 .btn-ghost:hover { border-color: var(--navy); }
 .btn-block { width: 100%; }
 
+/* Big & tall feature band */
+.feature { background: var(--navy); color: #fff; }
+.feature-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding-block: 28px; }
+.feature h2 { margin: 0 0 6px; font: 900 clamp(1.6rem, 3.4vw, 2.4rem)/1 var(--f-display); font-stretch: 72%; text-transform: uppercase; color: #fff; }
+.feature p { margin: 0; color: #dfe7f2; max-width: 40em; }
+.feature .feature-eyebrow { margin-bottom: 10px; color: #c9d6e8; }
+.btn-signal { background: var(--signal); color: var(--signal-ink); }
+.btn-signal:hover { filter: brightness(1.08); }
+
 /* Transit ticket */
 .ticket {
   position: relative; background: var(--paper); border: 1.5px solid var(--line); border-radius: 10px;
